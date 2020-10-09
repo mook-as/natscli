@@ -1,0 +1,54 @@
+name: release
+on:
+  workflow_dispatch: {}
+  release:
+    types: [created, edited]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64]
+    outputs:
+      name: ${{ steps.name.outputs.repo }}
+    steps:
+    - uses: actions/checkout@v2
+    - id: name
+      name: Calculate repo name
+      run: |
+        repo="${{ github.repository }}"
+        echo "::set-output name=repo::${repo##*/}"
+    - uses: actions/setup-go@v2
+    - name: Build Linux
+      run: go build -o ${REPO}-${GOOS}-${GOARCH}
+      env:
+        REPO: ${{ steps.name.outputs.repo }}
+        GOOS: ${{ matrix.os }}
+        GOARCH: ${{ matrix.arch }}
+    - uses: actions/upload-artifact@v2
+      with:
+        path: ${{ steps.name.outputs.repo }}-${{ matrix.os }}-${{ matrix.arch }}
+        name: ${{ steps.name.outputs.repo }}-${{ matrix.os }}-${{ matrix.arch }}
+        if-no-files-found: error
+  release:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64]
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: ${{ needs.build.outputs.name }}-${{ matrix.os }}-${{ matrix.arch }}
+    - uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ${{ needs.build.outputs.name }}-${{ matrix.os }}-${{ matrix.arch }}
+        asset_name: ${{ needs.build.outputs.name }}-${{ matrix.os }}-${{ matrix.arch }}
+        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
