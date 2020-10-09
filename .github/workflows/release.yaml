@@ -32,7 +32,7 @@ jobs:
         name: ${{ steps.name.outputs.repo }}-${{ matrix.os }}-${{ matrix.arch }}
         if-no-files-found: error
   release:
-    if: github.event_name == release
+    if: github.event_name == 'release'
     needs: build
     runs-on: ubuntu-latest
     steps:
