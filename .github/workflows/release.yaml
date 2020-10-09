@@ -39,19 +39,19 @@ jobs:
     - uses: actions/download-artifact@v2
     - uses: actions/upload-release-asset@v1
       with:
-        upload_url: ${{ .github.event.upload_url }}
+        upload_url: ${{ github.event.upload_url }}
         asset_path: ${{ steps.name.outputs.repo }}-linux-amd64/${{ steps.name.outputs.repo }}-linux-amd64
         asset_name: ${{ steps.name.outputs.repo }}-linux-amd64
         asset_content_type: application/octet-stream
     - uses: actions/upload-release-asset@v1
       with:
-        upload_url: ${{ .github.event.upload_url }}
+        upload_url: ${{ github.event.upload_url }}
         asset_path: ${{ steps.name.outputs.repo }}-darwin-amd64/${{ steps.name.outputs.repo }}-darwin-amd64
         asset_name: ${{ steps.name.outputs.repo }}-darwin-amd64
         asset_content_type: application/octet-stream
     - uses: actions/upload-release-asset@v1
       with:
-        upload_url: ${{ .github.event.upload_url }}
+        upload_url: ${{ github.event.upload_url }}
         asset_path: ${{ steps.name.outputs.repo }}-windows-amd64/${{ steps.name.outputs.repo }}-windows-amd64
         asset_name: ${{ steps.name.outputs.repo }}-windows-amd64
         asset_content_type: application/octet-stream
